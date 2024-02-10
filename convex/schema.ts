@@ -2,10 +2,13 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-  thumbails: defineTable({
+  thumbnails: defineTable({
     title: v.string(),
     user: v.string(),
-    aImage: v.optional(v.string()),
-    bImage: v.optional(v.string()),
+    aImage: v.string(),
+    aVotes: v.number(),
+    bImage: v.string(),
+    bVotes: v.number(),
+    voteIds: v.array(v.string()),
   }),
 });

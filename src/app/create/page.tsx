@@ -23,7 +23,6 @@ const defaultErrorState = {
 const CreatePage = () => {
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
   const createThumbnail = useMutation(api.thumbnails.createThumbnail);
-  // const saveStorageId = useMutation(api.files.saveStorageId);
   const [imageA, setImageA] = useState("");
   const [imageB, setImageB] = useState("");
   const [errors, setErrors] = useState(defaultErrorState);
@@ -68,8 +67,6 @@ const CreatePage = () => {
               imageB: "second image is required",
             };
           }
-          debugger;
-
           setErrors(newErrors);
 
           const hasErrors = Object.values(newErrors).some(Boolean);
