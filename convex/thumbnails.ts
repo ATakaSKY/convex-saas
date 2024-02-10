@@ -3,13 +3,18 @@ import { v } from "convex/values";
 
 // Create a new thumbnail with the given input
 export const createThumbnail = mutation({
-  args: { title: v.string() },
+  args: { title: v.string(), imageA: v.string(), imageB: v.string() },
   handler: async (ctx, args) => {
     const user = await ctx.auth.getUserIdentity();
     if (!user) {
       throw new Error("you've to be logged in to create thubmail");
     }
-    await ctx.db.insert("thumbails", { title: args.title, user: user.subject });
+    return await ctx.db.insert("thumbails", {
+      title: args.title,
+      user: user.subject,
+      aImage: args.imageA,
+      bImage: args.imageB,
+    });
   },
 });
 

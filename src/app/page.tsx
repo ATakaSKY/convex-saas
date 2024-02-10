@@ -13,9 +13,7 @@ export default function Home() {
   console.log("thumbnails", thumbnails);
 
   return (
-    <main>
-      {isSignedIn ? <SignOutButton /> : <SignInButton />}
-
+    <main className="mt-4">
       <form
         onSubmit={async (e) => {
           e.preventDefault();
