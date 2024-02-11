@@ -13,4 +13,8 @@ export default defineSchema({
     profileImage: v.optional(v.string()),
     name: v.optional(v.string()),
   }),
+  users: defineTable({
+    userId: v.string(),
+    email: v.string(),
+  }),
 });
