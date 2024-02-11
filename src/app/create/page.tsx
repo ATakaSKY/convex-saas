@@ -81,7 +81,7 @@ const CreatePage = () => {
 
           const thumbnailId = await createThumbnail({ title, imageA, imageB });
 
-          router.push(`/thumbnail/${thumbnailId}`);
+          router.push(`/thumbnails/${thumbnailId}`);
         }}
       >
         <div className="flex flex-col w-full">
