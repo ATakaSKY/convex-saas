@@ -1,6 +1,7 @@
 import { paginationOptsValidator } from "convex/server";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { isUserSubscribed } from "./users";
 
 // Create a new thumbnail with the given input
 export const createThumbnail = mutation({
@@ -10,6 +11,12 @@ export const createThumbnail = mutation({
     if (!user) {
       throw new Error("you've to be logged in to create thubmail");
     }
+
+    const hasSubscription = await isUserSubscribed(ctx);
+    if (!hasSubscription) {
+      throw new Error("you must be subscribed to create thubmail");
+    }
+
     return await ctx.db.insert("thumbnails", {
       title: args.title,
       user: user.subject,

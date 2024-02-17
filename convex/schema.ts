@@ -16,5 +16,9 @@ export default defineSchema({
   users: defineTable({
     userId: v.string(),
     email: v.string(),
-  }),
+    subscriptionId: v.optional(v.string()),
+    endsOn: v.optional(v.number()),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_subscriptionId", ["subscriptionId"]),
 });
