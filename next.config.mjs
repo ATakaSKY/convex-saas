@@ -5,6 +5,9 @@ const nextConfig = {
       {
         hostname: "fleet-firefly-566.convex.cloud",
       },
+      {
+        hostname: "ceaseless-reindeer-375.convex.cloud",
+      },
     ],
   },
 };
