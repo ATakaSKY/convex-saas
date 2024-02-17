@@ -25,6 +25,23 @@ export default function DashboardPage() {
         Your Thumbnail Tests
       </h1>
 
+      {thumbnails && thumbnails.length === 0 && (
+        <div className="flex flex-col items-center gap-8">
+          <Image
+            className="rounded-lg bg-white p-12"
+            src="/void.svg"
+            alt="no found icon"
+            width="400"
+            height="400"
+          />
+          <div className="text-2xl font-bold">You have no thumbnail tests</div>
+
+          <Button asChild>
+            <Link href="/create">Create a Thumbnail Test</Link>
+          </Button>
+        </div>
+      )}
+
       <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
         {sortedThumbnails?.map((thumbnail) => {
           return (

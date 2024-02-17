@@ -16,7 +16,7 @@ import { formatDistance } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Doc } from "../../../convex/_generated/dataModel";
 import { useSession } from "@clerk/nextjs";
-// import { SkeletonCard } from "@/components/skeleton-card";
+import { SkeletonCard } from "@/components/skeleton-card";
 
 export default function ExplorePage() {
   const {
@@ -41,13 +41,13 @@ export default function ExplorePage() {
     <div className="pt-12">
       <h1 className="text-center text-4xl font-bold mb-12">Community Review</h1>
 
-      {/* {isLoading && (
+      {isLoading && (
         <div className="animate-pulse mb-12 mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 pb-40">
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
         </div>
-      )} */}
+      )}
 
       {!isLoading && thumbnails.length === 0 && (
         <div className="flex flex-col items-center gap-8">
@@ -84,7 +84,7 @@ export default function ExplorePage() {
                     </Avatar>
 
                     <div>
-                      {/* <p>{thumbnail.name}</p> */}
+                      <p>{thumbnail.name}</p>
 
                       <p>
                         {formatDistance(
