@@ -38,6 +38,7 @@ export const createUser = internalMutation({
     await ctx.db.insert("users", {
       email: args.email,
       userId: args.userId,
+      credits: 5,
     });
   },
 });

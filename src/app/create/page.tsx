@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
+import { UpgradeButton } from "@/components/upgrade-button";
+import { useSession } from "@clerk/nextjs";
 
 const defaultErrorState = {
   title: "",
@@ -28,6 +30,7 @@ const CreatePage = () => {
   const [errors, setErrors] = useState(defaultErrorState);
   const { toast } = useToast();
   const router = useRouter();
+  const { session } = useSession();
 
   return (
     <div className="mt-16">
@@ -79,9 +82,27 @@ const CreatePage = () => {
             return;
           }
 
-          const thumbnailId = await createThumbnail({ title, imageA, imageB });
+          try {
+            const thumbnailId = await createThumbnail({
+              title,
+              imageA,
+              imageB,
+              profileImage: session?.user.imageUrl,
+            });
 
-          router.push(`/thumbnails/${thumbnailId}`);
+            router.push(`/thumbnails/${thumbnailId}`);
+          } catch (err) {
+            toast({
+              title: "You ran out of a free credits",
+              description: (
+                <div>
+                  You must <UpgradeButton /> in order to create more thumbnail
+                  tests
+                </div>
+              ),
+              variant: "destructive",
+            });
+          }
         }}
       >
         <div className="flex flex-col w-full">

@@ -1,31 +1,79 @@
 import { paginationOptsValidator } from "convex/server";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { isUserSubscribed } from "./users";
+import { getFullUser, isUserSubscribed } from "./users";
+import { getUser, getUserId } from "./util";
 
 // Create a new thumbnail with the given input
 export const createThumbnail = mutation({
-  args: { title: v.string(), imageA: v.string(), imageB: v.string() },
+  args: {
+    title: v.string(),
+    imageA: v.string(),
+    imageB: v.string(),
+    profileImage: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
+    const userId = await getUserId(ctx);
+    if (!userId) {
       throw new Error("you've to be logged in to create thubmail");
     }
 
     const hasSubscription = await isUserSubscribed(ctx);
-    if (!hasSubscription) {
+    const user = await getFullUser(ctx, userId);
+
+    if (!user) {
+      throw new Error("no user with that id found");
+    }
+
+    if (!hasSubscription && user?.credits <= 0) {
       throw new Error("you must be subscribed to create thubmail");
     }
 
+    await ctx.db.patch(user._id, {
+      credits: Math.max(0, user.credits - 1),
+    });
+
     return await ctx.db.insert("thumbnails", {
       title: args.title,
-      user: user.subject,
+      user: userId,
       aImage: args.imageA,
       bImage: args.imageB,
       aVotes: 0,
       bVotes: 0,
       voteIds: [],
-      profileImage: user.pictureUrl,
+      profileImage: args.profileImage,
+      comments: [],
+    });
+  },
+});
+
+export const addComment = mutation({
+  args: { thumbnailId: v.id("thumbnails"), text: v.string() },
+  handler: async (ctx, args) => {
+    const user = await getUser(ctx);
+    if (!user) {
+      throw new Error("you've to be logged in to create thubmail");
+    }
+
+    const thumbnail = await ctx.db.get(args.thumbnailId);
+    if (!thumbnail) {
+      throw new Error("thumbnail does not exist");
+    }
+
+    if (!thumbnail.comments) {
+      thumbnail.comments = [];
+    }
+
+    thumbnail.comments.unshift({
+      createdAt: Date.now(),
+      text: args.text,
+      userId: user.subject,
+      name: user.name ?? "Annoymous",
+      profileUrl: user.pictureUrl ?? "",
+    });
+
+    await ctx.db.patch(thumbnail._id, {
+      comments: thumbnail.comments,
     });
   },
 });
@@ -46,7 +94,23 @@ export const getThumbnailsForUser = query({
 export const getThumbnail = query({
   args: { thumbnailId: v.id("thumbnails") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.thumbnailId);
+    const thumbnail = await ctx.db.get(args.thumbnailId);
+
+    if (!thumbnail) {
+      return null;
+    }
+    const hasSubscription = await isUserSubscribed(ctx);
+
+    let comments = thumbnail.comments?.length === 0 ? [] : [thumbnail.comments?.[0]];
+
+    if(hasSubscription){
+      comments = thumbnail.comments
+    }
+
+    return {
+      ...thumbnail,
+      comments,
+    };
   },
 });
 

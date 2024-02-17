@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useSession } from "@clerk/nextjs";
 import { Progress } from "@/components/ui/progress";
 import { useRef } from "react";
+import { Comments } from "./comments";
 
 const Thumbnail = () => {
   const params = useParams<{ thumbnailId: Id<"thumbnails"> }>();
@@ -120,6 +121,8 @@ const Thumbnail = () => {
           )}
         </div>
       </div>
+
+      <Comments thumbnail={thumbnail} />
     </div>
   );
 };
