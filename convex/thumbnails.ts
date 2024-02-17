@@ -80,7 +80,7 @@ export const addComment = mutation({
 
 export const getThumbnailsForUser = query({
   handler: async (ctx) => {
-    const user = await ctx.auth.getUserIdentity();
+    const user = await getUser(ctx);
     if (!user) {
       return [];
     }
@@ -101,10 +101,11 @@ export const getThumbnail = query({
     }
     const hasSubscription = await isUserSubscribed(ctx);
 
-    let comments = thumbnail.comments?.length === 0 ? [] : [thumbnail.comments?.[0]];
+    let comments =
+      thumbnail.comments?.length === 0 ? [] : [thumbnail.comments?.[0]];
 
-    if(hasSubscription){
-      comments = thumbnail.comments
+    if (hasSubscription) {
+      comments = thumbnail.comments;
     }
 
     return {
@@ -127,14 +128,14 @@ export const getRecentThumbnails = query({
 export const voteOnThumbnail = mutation({
   args: { thumbnailId: v.id("thumbnails"), voteId: v.string() },
   handler: async (ctx, args) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
+    const userId = await getUserId(ctx);
+    if (!userId) {
       throw new Error("you've to be logged to vote on a thumbnail");
     }
 
     const thumbnail = await ctx.db.get(args.thumbnailId);
 
-    if (thumbnail?.voteIds.includes(user.subject)) {
+    if (thumbnail?.voteIds.includes(userId)) {
       throw new Error("you've already voted");
     }
 
@@ -146,13 +147,13 @@ export const voteOnThumbnail = mutation({
       thumbnail.aVotes++;
       await ctx.db.patch(thumbnail._id, {
         aVotes: thumbnail.aVotes,
-        voteIds: [...new Set([...thumbnail.voteIds, user.subject])],
+        voteIds: [...new Set([...thumbnail.voteIds, userId])],
       });
     } else {
       thumbnail.bVotes++;
       await ctx.db.patch(thumbnail._id, {
         bVotes: thumbnail?.bVotes,
-        voteIds: [...new Set([...thumbnail.voteIds, user.subject])],
+        voteIds: [...new Set([...thumbnail.voteIds, userId])],
       });
     }
   },
